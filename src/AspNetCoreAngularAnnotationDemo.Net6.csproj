@@ -9,7 +9,7 @@
 		<SpaProxyLaunchCommand>npm start</SpaProxyLaunchCommand>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<EnableDefaultItems>false</EnableDefaultItems>
-		<Version>12.2.6.1</Version>
+		<Version>12.2.7.1</Version>
 		<EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
 	</PropertyGroup>
 
@@ -49,23 +49,23 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="6.0.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.0" />
-		<PackageReference Include="SkiaSharp" Version="2.88.0" />
+		<PackageReference Include="SkiaSharp" Version="2.88.5" />
 	</ItemGroup>
 
 	<ItemGroup>
     <PackageReference Include="Vintasoft.Shared" Version="4.0.0.3" />
-    <PackageReference Include="Vintasoft.Imaging" Version="12.2.6.1" />
-    <PackageReference Include="Vintasoft.Imaging.Drawing.SkiaSharp" Version="12.2.6.1" />
-    <PackageReference Include="Vintasoft.Imaging.Annotation" Version="12.2.6.1" />
-    <PackageReference Include="Vintasoft.Imaging.Annotation.Pdf" Version="12.2.6.1" />
-    <PackageReference Include="Vintasoft.Imaging.Jbig2Codec" Version="9.2.6.1" />
-    <PackageReference Include="Vintasoft.Imaging.Jpeg2000Codec" Version="8.2.6.1" />
-    <PackageReference Include="Vintasoft.Imaging.Pdf" Version="9.2.6.1" />
+    <PackageReference Include="Vintasoft.Imaging" Version="12.2.7.1" />
+    <PackageReference Include="Vintasoft.Imaging.Drawing.SkiaSharp" Version="12.2.7.1" />
+    <PackageReference Include="Vintasoft.Imaging.Annotation" Version="12.2.7.1" />
+    <PackageReference Include="Vintasoft.Imaging.Annotation.Pdf" Version="12.2.7.1" />
+    <PackageReference Include="Vintasoft.Imaging.Jbig2Codec" Version="9.2.7.1" />
+    <PackageReference Include="Vintasoft.Imaging.Jpeg2000Codec" Version="8.2.7.1" />
+    <PackageReference Include="Vintasoft.Imaging.Pdf" Version="9.2.7.1" />
     <PackageReference Include="Vintasoft.Shared.Web" Version="4.0.0.3" />
-    <PackageReference Include="Vintasoft.Imaging.Web.Services" Version="12.2.6.1" />
-    <PackageReference Include="Vintasoft.Imaging.AspNetCore.ApiControllers" Version="12.2.6.1" />
-    <PackageReference Include="Vintasoft.Imaging.Annotation.Web.Services" Version="12.2.6.1" />
-    <PackageReference Include="Vintasoft.Imaging.Annotation.AspNetCore.ApiControllers" Version="12.2.6.1" />
+    <PackageReference Include="Vintasoft.Imaging.Web.Services" Version="12.2.7.1" />
+    <PackageReference Include="Vintasoft.Imaging.AspNetCore.ApiControllers" Version="12.2.7.1" />
+    <PackageReference Include="Vintasoft.Imaging.Annotation.Web.Services" Version="12.2.7.1" />
+    <PackageReference Include="Vintasoft.Imaging.Annotation.AspNetCore.ApiControllers" Version="12.2.7.1" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -77,8 +77,7 @@
 	  <Compile Include="Controllers\Annotations\CustomAnnotations\MarkAnnotation\MarkAnnotationType.cs" />
 	  <Compile Include="Controllers\Annotations\CustomAnnotations\TriangleAnnotation\TriangleAnnotationData.cs" />
 	  <Compile Include="Controllers\Annotations\MyVintasoftAnnotationCollectionApiController.cs" />
-	  <Compile Include="Controllers\File\MyVintasoftFileApiController.cs" />
-	  <Compile Include="Controllers\File\MyVintasoftFileWebService.cs" />
+	  <Compile Include="Controllers\File\MyVintasoftAnnotatedFileApiController.cs" />
 	  <Compile Include="Controllers\File\UploadedFilesListResponseParams.cs" />
 	  <Compile Include="Controllers\ImageCollection\MyVintasoftImageCollectionApiController.cs" />
 	  <Compile Include="Controllers\ImageRendering\MyVintasoftImageApiController.cs" />
@@ -99,6 +98,7 @@
 	  <None Include="wwwroot\Content\Cursors\Zoom.cur" />
 	  <None Include="wwwroot\Resources\DefaultCMYK.icc" />
 	  <None Include="wwwroot\Resources\DefaultRGB.icc" />
+	  <Folder Include="wwwroot\VintasoftCache\" />
 	</ItemGroup>
 
 </Project>
