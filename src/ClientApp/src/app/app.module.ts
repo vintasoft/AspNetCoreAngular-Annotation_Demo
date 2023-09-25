@@ -11,7 +11,6 @@ import { AnnotationDemoComponent } from './annotation-demo/annotation-demo';
 
 import { BlockUiDialogContent, BlockUiDialog } from './dialogs/block-ui-dialog';
 import { ErrorMessageDialogContent, ErrorMessageDialog } from './dialogs/error-message-dialog';
-import { ImageViewerSettingsDialogContent, ImageViewerSettingsDialog } from './dialogs/image-viewer-settings-dialog';
 import { AnnotationSettingsDialogContent, AnnotationSettingsDialog } from './dialogs/annotation-settings-dialog';
 
 @NgModule({
@@ -22,8 +21,6 @@ import { AnnotationSettingsDialogContent, AnnotationSettingsDialog } from './dia
     BlockUiDialogContent,
     ErrorMessageDialog,
     ErrorMessageDialogContent,
-    ImageViewerSettingsDialog,
-    ImageViewerSettingsDialogContent,
     AnnotationSettingsDialog,
     AnnotationSettingsDialogContent
   ],
@@ -32,8 +29,6 @@ import { AnnotationSettingsDialogContent, AnnotationSettingsDialog } from './dia
     BlockUiDialogContent,
     ErrorMessageDialog,
     ErrorMessageDialogContent,
-    ImageViewerSettingsDialog,
-    ImageViewerSettingsDialogContent,
     AnnotationSettingsDialog,
     AnnotationSettingsDialogContent
   ],
