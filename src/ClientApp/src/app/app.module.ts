@@ -11,7 +11,6 @@ import { AnnotationDemoComponent } from './annotation-demo/annotation-demo';
 
 import { BlockUiDialogContent, BlockUiDialog } from './dialogs/block-ui-dialog';
 import { ErrorMessageDialogContent, ErrorMessageDialog } from './dialogs/error-message-dialog';
-import { AnnotationSettingsDialogContent, AnnotationSettingsDialog } from './dialogs/annotation-settings-dialog';
 
 @NgModule({
   declarations: [
@@ -20,17 +19,13 @@ import { AnnotationSettingsDialogContent, AnnotationSettingsDialog } from './dia
     BlockUiDialog,
     BlockUiDialogContent,
     ErrorMessageDialog,
-    ErrorMessageDialogContent,
-    AnnotationSettingsDialog,
-    AnnotationSettingsDialogContent
+    ErrorMessageDialogContent
   ],
   entryComponents: [
     BlockUiDialog,
     BlockUiDialogContent,
     ErrorMessageDialog,
-    ErrorMessageDialogContent,
-    AnnotationSettingsDialog,
-    AnnotationSettingsDialogContent
+    ErrorMessageDialogContent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

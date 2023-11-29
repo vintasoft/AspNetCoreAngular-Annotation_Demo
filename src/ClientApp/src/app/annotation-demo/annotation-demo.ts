@@ -4,7 +4,6 @@ import { HttpClient } from '@angular/common/http';
 import { BlockUiDialog } from '../dialogs/block-ui-dialog';
 import { ErrorMessageDialog } from "../dialogs/error-message-dialog";
 import { OpenFileHelper } from './open-file-helper';
-import { SaveAnnotationsAndDownloadFileHelper } from './save-annotations-and-download-file-helper';
 import { AnnotationUiHelper } from './annotation-UI-helper';
 
 
@@ -23,9 +22,6 @@ export class AnnotationDemoComponent {
   // Helps to open files.
   _openFileHelper: OpenFileHelper | null;
 
-  // Helps to create UI for image annotating
-  _annotationUiHelper: AnnotationUiHelper | null;
-
   // Dialog that allows to block UI.
   _blockUiDialog: BlockUiDialog | null;
 
@@ -36,7 +32,6 @@ export class AnnotationDemoComponent {
 
     this._docViewer = null;
     this._openFileHelper = null;
-    this._annotationUiHelper = null;
     this._blockUiDialog = null;
   }
 
@@ -52,7 +47,7 @@ export class AnnotationDemoComponent {
       Vintasoft.Shared.WebImagingEnviromentJS.set_SessionId(data.sessionId);
 
       // specify web services, which should be used by Vintasoft Web Document Viewer
-      Vintasoft.Shared.WebServiceJS.defaultFileService = new Vintasoft.Shared.WebServiceControllerJS('vintasoft/api/MyVintasoftAnnotatedFileApi');
+      Vintasoft.Shared.WebServiceJS.defaultFileService = new Vintasoft.Shared.WebServiceControllerJS('vintasoft/api/MyVintasoftFileApi');
       Vintasoft.Shared.WebServiceJS.defaultImageCollectionService = new Vintasoft.Shared.WebServiceControllerJS('vintasoft/api/MyVintasoftImageCollectionApi');
       Vintasoft.Shared.WebServiceJS.defaultImageService = new Vintasoft.Shared.WebServiceControllerJS('vintasoft/api/MyVintasoftImageApi');
       Vintasoft.Shared.WebServiceJS.defaultAnnotationService = new Vintasoft.Shared.WebServiceControllerJS('vintasoft/api/MyVintasoftAnnotationCollectionApi');
@@ -62,6 +57,15 @@ export class AnnotationDemoComponent {
 
       // create the document viewer settings
       let docViewerSettings: Vintasoft.Imaging.DocumentViewer.WebDocumentViewerSettingsJS = new Vintasoft.Imaging.DocumentViewer.WebDocumentViewerSettingsJS("documentViewerContainer", "documentViewer", true);
+      // specify that the meain menu should contain the annotation menu
+      docViewerSettings.set_ShowAnnotationMenuInMainMenu(true);
+      // specify that the side panel should contain the annotation list panel
+      docViewerSettings.set_ShowAnnotationListPanelInSidePanel(true);
+      // specify that the side panel should contain the annotation comment list panel
+      docViewerSettings.set_ShowAnnotationCommentListPanelInSidePanel(true);
+      // specify that document viewer should show "Export and download file" button instead of "Download file" button
+      docViewerSettings.set_CanExportAndDownloadFile(true);
+      docViewerSettings.set_CanDownloadFile(false);
 
       // initialize main menu of document viewer
       this.__initMenu(docViewerSettings);
@@ -75,6 +79,8 @@ export class AnnotationDemoComponent {
       // create the document viewer
       this._docViewer = new Vintasoft.Imaging.DocumentViewer.WebDocumentViewerJS(docViewerSettings);
 
+      this._docViewer.set_CurrentUser("Guest");
+
       // subscribe to the "warningOccured" event of document viewer
       Vintasoft.Shared.subscribeToEvent(this._docViewer, 'warningOccured', this.__docViewer_warningOccured);
       // subscribe to the asyncOperationStarted event of document viewer
@@ -84,15 +90,15 @@ export class AnnotationDemoComponent {
       // subscribe to the asyncOperationFailed event of document viewer
       Vintasoft.Shared.subscribeToEvent(this._docViewer, 'asyncOperationFailed', this.__docViewer_asyncOperationFailed);
 
+      // subscribe to the events of the annotation comment list panel
+      this.__subscribeToAnnotationCommentListPanelEvents();
+
       // initialize visual tools
       this.__initializeVisualTools(this._docViewer);
 
-      let interactionAreaAppearanceManager: Vintasoft.Imaging.Annotation.UI.WebInteractionAreaAppearanceManagerJS
-        = this._docViewer.getInteractionAreaAppearanceManager() as Vintasoft.Imaging.Annotation.UI.WebInteractionAreaAppearanceManagerJS;
-      let rotationPoint: Vintasoft.Imaging.UI.VisualTools.WebRotationInteractionPointJS
-        = interactionAreaAppearanceManager.get_RotationPoint();
-      // set the cursor for interaction point that allows to rotate annotation
-      rotationPoint.set_Cursor("url('Content/Cursors/Rotate.cur'), auto");
+      // get the thumbnail viewer of document viewer
+      let thumbnailViewer1: Vintasoft.Imaging.UI.WebThumbnailViewerJS = this._docViewer.get_ThumbnailViewer();
+      thumbnailViewer1.set_CanDragThumbnails(true);
 
       // get the image viewer of document viewer
       let imageViewer1: Vintasoft.Imaging.UI.WebImageViewerJS = this._docViewer.get_ImageViewer();
@@ -106,6 +112,7 @@ export class AnnotationDemoComponent {
       progressImage.src = window.location + 'Images/fileUploadProgress.gif';
       // specify that the image viewer must use the progress image for indicating the image loading progress
       imageViewer1.set_ProgressImage(progressImage);
+
       // get the visual tool, which allows to annotate and pan images in image viewer
       let annotationPanTool: Vintasoft.Imaging.UI.VisualTools.WebVisualToolJS
         = this._docViewer.getVisualToolById('AnnotationVisualTool,PanTool');
@@ -151,11 +158,10 @@ export class AnnotationDemoComponent {
       = items.getItemByRegisteredId('imageViewerPanel') as Vintasoft.Imaging.DocumentViewer.Panels.WebUiImageViewerPanelJS;
     // if panel exists
     if (imageViewerPanel != null) {
-      if (this._annotationUiHelper == null) {
-        this._annotationUiHelper = new AnnotationUiHelper(this.modalService);
-      }
+      // enable ability to set custom image rotation
+      imageViewerPanel.set_CanSetCustomViewRotationUsingContextMenu(true);
       // initialize the annotation context menu
-      this._annotationUiHelper.initAnnotationContextMenu(docViewerSettings, imageViewerPanel);
+      AnnotationUiHelper.initAnnotationViewerContextMenu(imageViewerPanel);
     }
   }
 
@@ -167,11 +173,6 @@ export class AnnotationDemoComponent {
    * Registers custom UI elements in "WebUiElementsFactoryJS".
    */
   __registerNewUiElements() {
-    let saveAnnotationsAndDownloadFileHelper: SaveAnnotationsAndDownloadFileHelper = new SaveAnnotationsAndDownloadFileHelper(this.__showErrorMessage);
-
-    // override the "Download image" button in web UI elements factory
-    Vintasoft.Imaging.UI.UIElements.WebUiElementsFactoryJS.registerElement('downloadImageButton', saveAnnotationsAndDownloadFileHelper.createDownloadFileWithAnnotationsButton);
-
     // register the "Pan" button in web UI elements factory
     Vintasoft.Imaging.UI.UIElements.WebUiElementsFactoryJS.registerElement('panToolButton', this.__createAnnotationAndPanToolButton);
   }
@@ -190,21 +191,19 @@ export class AnnotationDemoComponent {
     if (uploadFileButton != null)
       uploadFileButton.set_FileExtensionFilter('.bmp, .emf, .gif, .ico, .cur, .jpg, .jpeg, .jls, .pcx, .png, .tif, .tiff, .wmf, .jb2, .jbig2, .jp2, .j2k, .j2c, .jpc, .pdf');
 
-    // get the main menu of document viewer
-    let mainMenu: Vintasoft.Imaging.UI.Panels.WebUiPanelContainerJS
-      = items.getItemByRegisteredId('mainMenu') as Vintasoft.Imaging.UI.Panels.WebUiPanelContainerJS;
-    // if main menu is found
-    if (mainMenu != null) {
-      // get items of main menu
-      let mainMenuItems: Vintasoft.Imaging.UI.UIElements.WebUiElementCollectionJS
-        = mainMenu.get_Items();
+    // get the "Tools" menu panel
+    let toolsMenuPanel: Vintasoft.Imaging.DocumentViewer.Panels.WebUiVisualToolsToolbarPanelJS
+      = items.getItemByRegisteredId("visualToolsToolbarPanel") as Vintasoft.Imaging.DocumentViewer.Panels.WebUiVisualToolsToolbarPanelJS;
+    // if menu panel is found
+    if (toolsMenuPanel != null) {
+      // get items of file menu panel
+      let toolsMenuPanelItems: Vintasoft.Imaging.UI.UIElements.WebUiElementCollectionJS = toolsMenuPanel.get_Items();
 
-      // add "Annotation" menu panel
-      mainMenuItems.addItem('annotationsMenuPanel');
-    }
-
-    if (this._annotationUiHelper == null) {
-      this._annotationUiHelper = new AnnotationUiHelper(this.modalService);
+      let rectangularSelectionToolButton: Vintasoft.Imaging.DocumentViewer.UIElements.WebUiVisualToolButtonJS
+        = toolsMenuPanelItems.getItemByRegisteredId("rectangularSelectionToolButton") as Vintasoft.Imaging.DocumentViewer.UIElements.WebUiVisualToolButtonJS;
+      if (rectangularSelectionToolButton != null)
+        // remove the "Rectangular Selection Tool" button from the menu panel
+        toolsMenuPanelItems.removeItem(rectangularSelectionToolButton);
     }
   }
 
@@ -216,18 +215,6 @@ export class AnnotationDemoComponent {
     // get items of document viewer
     let items: Vintasoft.Imaging.UI.UIElements.WebUiElementCollectionJS
       = docViewerSettings.get_Items();
-
-    let sidePanel: Vintasoft.Imaging.UI.Panels.WebUiSidePanelJS
-      = items.getItemByRegisteredId('sidePanel') as Vintasoft.Imaging.UI.Panels.WebUiSidePanelJS;
-    if (sidePanel != null) {
-      let sidePanelItems: Vintasoft.Imaging.UI.UIElements.WebUiElementCollectionJS = sidePanel.get_PanelsCollection();
-
-      if (this._annotationUiHelper == null) {
-        this._annotationUiHelper = new AnnotationUiHelper(this.modalService);
-      }
-      // initialize the annotation panel
-      this._annotationUiHelper.initAnnotationPanel(sidePanelItems);
-    }
 
     // get the thumbnail viewer panel of document viewer
     let thumbnailViewerPanel: Vintasoft.Imaging.DocumentViewer.Panels.WebUiThumbnailViewerPanelJS
@@ -272,39 +259,19 @@ export class AnnotationDemoComponent {
   __initializeVisualTools(docViewer: Vintasoft.Imaging.DocumentViewer.WebDocumentViewerJS) {
     let rectangularSelectionTool: Vintasoft.Imaging.UI.VisualTools.WebVisualToolJS
       = docViewer.getVisualToolById('RectangularSelectionTool');
-    let zoomTool: Vintasoft.Imaging.UI.VisualTools.WebVisualToolJS
-      = docViewer.getVisualToolById('ZoomTool');
-    let panTool: Vintasoft.Imaging.UI.VisualTools.WebVisualToolJS
-      = docViewer.getVisualToolById('PanTool');
-    let magnifierTool: Vintasoft.Imaging.UI.VisualTools.WebVisualToolJS
-      = docViewer.getVisualToolById('MagnifierTool');
-    let zoomSelectionTool: Vintasoft.Imaging.UI.VisualTools.WebVisualToolJS
-      = docViewer.getVisualToolById('ZoomSelectionTool');
-
-    let zoomCursor: string = "url('Content/Cursors/Zoom.cur'), auto";
-    let magnifierCursor: string = "url('Content/Cursors/Magnifier.cur'), auto";
-    let panCursor: string = "url('Content/Cursors/CloseHand.cur'), auto";
-
     rectangularSelectionTool.set_DisableContextMenu(true);
 
-    panTool.set_Cursor('pointer');
-    panTool.set_ActionCursor(panCursor);
-
-    magnifierTool.set_Cursor(magnifierCursor);
+    let magnifierTool: Vintasoft.Imaging.UI.VisualTools.WebVisualToolJS = docViewer.getVisualToolById('MagnifierTool');
     magnifierTool.set_DisableContextMenu(true);
 
-    zoomTool.set_Cursor(zoomCursor);
-    zoomTool.set_ActionCursor(zoomCursor);
+    let zoomTool: Vintasoft.Imaging.UI.VisualTools.WebVisualToolJS = docViewer.getVisualToolById('ZoomTool');
     zoomTool.set_DisableContextMenu(true);
 
-    zoomSelectionTool.set_ActionCursor(zoomCursor);
+    let zoomSelectionTool: Vintasoft.Imaging.UI.VisualTools.WebVisualToolJS = docViewer.getVisualToolById('ZoomSelectionTool');
     zoomSelectionTool.set_DisableContextMenu(true);
 
-
-    if (_annotationDemoComponent._annotationUiHelper != null) {
-      // initialize the annotation visual tool
-      _annotationDemoComponent._annotationUiHelper.initializeAnnotationVisualTool(docViewer);
-    }
+    // initialize the annotation visual tool
+    AnnotationUiHelper.initializeAnnotationVisualTool(docViewer);
   }
 
 
@@ -346,14 +313,6 @@ export class AnnotationDemoComponent {
   __docViewer_asyncOperationFinished(event: any, data: any) {
     // unblock UI
     _annotationDemoComponent.__unblockUI();
-
-    // get description of asynchronous operation
-    let description: string = data.description;
-    // if annotations are saving to the server
-    if (description === "Save annotations") {
-      // show message about successful saving
-      alert("Annotation collection is saved successfully.");
-    }
   }
 
   /**
@@ -378,6 +337,144 @@ export class AnnotationDemoComponent {
     else {
       // show error message
       _annotationDemoComponent.__showErrorMessage(description + ": unknown error.");
+    }
+  }
+
+
+
+  // === Annotation comment list panel events ===
+
+  /**
+   Subscribes to the events of annotation comment list panel.
+  */
+  __subscribeToAnnotationCommentListPanelEvents() {
+    if (this._docViewer == null)
+      return;
+
+    let items: Vintasoft.Imaging.UI.UIElements.WebUiElementCollectionJS = this._docViewer.get_Items();
+
+    let annotationCommentListPanel: Vintasoft.Imaging.DocumentViewer.Panels.WebUiAnnotationCommentListPanelJS
+      = items.getItemByRegisteredId("annotationCommentListPanel") as Vintasoft.Imaging.DocumentViewer.Panels.WebUiAnnotationCommentListPanelJS;
+
+    // subscribe to the "commentAdded" event of annotation comment list panel
+    Vintasoft.Shared.subscribeToEvent(annotationCommentListPanel, "commentAdded", this.__annotationCommentListPanel_commentAdded);
+    // subscribe to the "commentReplyAdded" event of annotation comment list panel
+    Vintasoft.Shared.subscribeToEvent(annotationCommentListPanel, "commentReplyAdded", this.__annotationCommentListPanel_commentReplyAdded);
+    // subscribe to the "stateCommentAdded" event of annotation comment list panel
+    Vintasoft.Shared.subscribeToEvent(annotationCommentListPanel, "stateCommentAdded", this.__annotationCommentListPanel_stateCommentAdded);
+    // subscribe to the "dialogShown" event of annotation comment list panel
+    Vintasoft.Shared.subscribeToEvent(annotationCommentListPanel, "commentSettingsDialogShown", this.__annotationCommentListPanel_commentSettingsDialogShown);
+  }
+
+  /**
+   The annotation comment is added.
+  */
+  __annotationCommentListPanel_commentAdded(event: any, eventArgs: any) {
+    // get panel
+    let annotationCommentListPanel = event.target;
+    // get comment
+    let comment = eventArgs.comment;
+
+    // if user is guest
+    if (comment.get_UserName() == "Guest") {
+      // change comment color
+      comment.set_Color("rgba(200,200,200,0.5)");
+      // update panel
+      annotationCommentListPanel.update();
+    }
+  }
+
+  /**
+   The reply is added to the annotation comment.
+  */
+  __annotationCommentListPanel_commentReplyAdded(event: any, eventArgs: any) {
+    // get panel
+    let annotationCommentListPanel = event.target;
+    // get comment reply
+    let commentReply = eventArgs.commentReply;
+
+    // if user is guest
+    if (commentReply.get_UserName() == "Guest") {
+      // change comment color
+      commentReply.set_Color("rgba(200,200,200,0.5)");
+      // update panel
+      annotationCommentListPanel.update();
+    }
+  }
+
+  /**
+   The state comment is added to the annotation comment.
+  */
+  __annotationCommentListPanel_stateCommentAdded(event: any, eventArgs: any) {
+    // get panel
+    let annotationCommentListPanel = event.target;
+    // get comment
+    let comment = eventArgs.comment;
+    // get state comment
+    let stateComment = eventArgs.stateComment;
+
+    // get the parent comment state
+    let stateCommentParentState = stateComment.get_ParentState();
+
+    let color;
+    // check the state
+    switch (stateCommentParentState) {
+      case "None":
+        color = "rgba(200,200,200,0.5)";
+        break;
+
+      case "Accepted":
+        color = "rgba(200,255,200,0.5)";
+        break;
+
+      case "Completed":
+        color = "rgba(200,255,200,1)";
+        break;
+
+      case "Rejected":
+        color = "rgba(255,200,200,1)";
+        break;
+
+      case "Cancelled":
+        color = "rgba(160,160,160,0.7)";
+        break;
+
+      default:
+        color = null;
+    }
+
+    // if supported state is found
+    if (color != null) {
+      // set comment color
+      comment.set_Color(color);
+      // set state comment color
+      stateComment.set_Color(color);
+      // update panel
+      annotationCommentListPanel.update();
+    }
+  }
+
+  /**
+   The annotation comment settings dialog is shown.
+  */
+  __annotationCommentListPanel_commentSettingsDialogShown(event: any, eventArgs: any) {
+    // get panel
+    let annotationCommentListPanel = event.target;
+    // get document viewer
+    let documentViewer = annotationCommentListPanel.get_RootControl();
+
+    // get comment
+    let comment = eventArgs.comment;
+    // get dialog
+    let dialog = eventArgs.dialog;
+
+    // if comment user name and current user name are different
+    if (comment.get_UserName() != documentViewer.get_CurrentUser()) {
+      // hide the dialog
+      dialog.hide();
+
+      // show the error message
+      _annotationDemoComponent.__showErrorMessage("Wrong user name.");
     }
   }
 

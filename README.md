@@ -27,9 +27,9 @@ The project demonstrates how to view and annotate images and documents in ASP.NE
    Vintasoft.Imaging.ImagingGlobalSettings.Register("REG_USER", "REG_EMAIL", "EXPIRATION_DATE", "REG_CODE");
    ```
 
-3. Build the project ("AspNetCoreAngularAnnotationDemo.Net7.csproj" file) in Visual Studio or using .NET CLI:
+3. Build the project ("AspNetCoreAngularAnnotationDemo.Net8.csproj" file) in Visual Studio or using .NET CLI:
    ```
-   dotnet build AspNetCoreAngularAnnotationDemo.Net7.csproj
+   dotnet build AspNetCoreAngularAnnotationDemo.Net8.csproj
    ```
 
 4. Run compiled application and try to view and annotate images and documents.
