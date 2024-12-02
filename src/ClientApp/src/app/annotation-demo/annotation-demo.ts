@@ -135,7 +135,7 @@ export class AnnotationDemoComponent {
    * Creates UI button for activating the visual tool, which allows to annotate and pan images in image viewer.
    */
   __createAnnotationAndPanToolButton() {
-    return new Vintasoft.Imaging.DocumentViewer.UIElements.WebUiVisualToolButtonJS({
+    return new Vintasoft.Imaging.UI.UIElements.WebUiVisualToolButtonJS({
       cssClass: 'vsui-button vsdv-tools-panButton',
       title: 'Pan',
       localizationId: "panToolButton"
@@ -156,8 +156,8 @@ export class AnnotationDemoComponent {
       = docViewerSettings.get_Items();
 
     // get the image viewer panel
-    let imageViewerPanel: Vintasoft.Imaging.DocumentViewer.Panels.WebUiImageViewerPanelJS
-      = items.getItemByRegisteredId('imageViewerPanel') as Vintasoft.Imaging.DocumentViewer.Panels.WebUiImageViewerPanelJS;
+    let imageViewerPanel: Vintasoft.Imaging.UI.Panels.WebUiImageViewerPanelJS
+      = items.getItemByRegisteredId('imageViewerPanel') as Vintasoft.Imaging.UI.Panels.WebUiImageViewerPanelJS;
     // if panel exists
     if (imageViewerPanel != null) {
       // enable ability to set custom image rotation
@@ -188,21 +188,24 @@ export class AnnotationDemoComponent {
     let items: Vintasoft.Imaging.UI.UIElements.WebUiElementCollectionJS
       = docViewerSettings.get_Items();
 
-    let uploadFileButton: Vintasoft.Imaging.UI.UIElements.WebUiUploadFileButtonJS
-      = items.getItemByRegisteredId('uploadFileButton') as Vintasoft.Imaging.UI.UIElements.WebUiUploadFileButtonJS;
-    if (uploadFileButton != null)
-      uploadFileButton.set_FileExtensionFilter('.bmp, .emf, .gif, .ico, .cur, .jpg, .jpeg, .jls, .pcx, .png, .tif, .tiff, .wmf, .jb2, .jbig2, .jp2, .j2k, .j2c, .jpc, .pdf');
+    let uploadAndOpenFileButton: Vintasoft.Imaging.UI.UIElements.WebUiUploadFileButtonJS = items.getItemByRegisteredId("uploadAndOpenFileButton") as Vintasoft.Imaging.UI.UIElements.WebUiUploadFileButtonJS;
+    if (uploadAndOpenFileButton != null)
+      uploadAndOpenFileButton.set_FileExtensionFilter(".bmp, .cur, .gif, .ico, .j2c, .j2k, .jb2, .jbig2, .jp2, .jpc, .jpeg, .jpg, .jls, .pbm, .pcx, .pdf, .png, .tga, .tif, .tiff");
+
+    let uploadAndAddFileButton: Vintasoft.Imaging.UI.UIElements.WebUiUploadFileButtonJS = items.getItemByRegisteredId("uploadAndAddFileButton") as Vintasoft.Imaging.UI.UIElements.WebUiUploadFileButtonJS;
+    if (uploadAndAddFileButton != null)
+      uploadAndAddFileButton.set_FileExtensionFilter(".bmp, .cur, .gif, .ico, .j2c, .j2k, .jb2, .jbig2, .jp2, .jpc, .jpeg, .jpg, .jls, .pbm, .pcx, .pdf, .png, .tga, .tif, .tiff");
 
     // get the "Tools" menu panel
-    let toolsMenuPanel: Vintasoft.Imaging.DocumentViewer.Panels.WebUiVisualToolsToolbarPanelJS
-      = items.getItemByRegisteredId("visualToolsToolbarPanel") as Vintasoft.Imaging.DocumentViewer.Panels.WebUiVisualToolsToolbarPanelJS;
+    let toolsMenuPanel: Vintasoft.Imaging.UI.Panels.WebUiVisualToolsToolbarPanelJS
+      = items.getItemByRegisteredId("visualToolsToolbarPanel") as Vintasoft.Imaging.UI.Panels.WebUiVisualToolsToolbarPanelJS;
     // if menu panel is found
     if (toolsMenuPanel != null) {
       // get items of file menu panel
       let toolsMenuPanelItems: Vintasoft.Imaging.UI.UIElements.WebUiElementCollectionJS = toolsMenuPanel.get_Items();
 
-      let rectangularSelectionToolButton: Vintasoft.Imaging.DocumentViewer.UIElements.WebUiVisualToolButtonJS
-        = toolsMenuPanelItems.getItemByRegisteredId("rectangularSelectionToolButton") as Vintasoft.Imaging.DocumentViewer.UIElements.WebUiVisualToolButtonJS;
+      let rectangularSelectionToolButton: Vintasoft.Imaging.UI.UIElements.WebUiVisualToolButtonJS
+        = toolsMenuPanelItems.getItemByRegisteredId("rectangularSelectionToolButton") as Vintasoft.Imaging.UI.UIElements.WebUiVisualToolButtonJS;
       if (rectangularSelectionToolButton != null)
         // remove the "Rectangular Selection Tool" button from the menu panel
         toolsMenuPanelItems.removeItem(rectangularSelectionToolButton);
@@ -219,8 +222,8 @@ export class AnnotationDemoComponent {
       = docViewerSettings.get_Items();
 
     // get the thumbnail viewer panel of document viewer
-    let thumbnailViewerPanel: Vintasoft.Imaging.DocumentViewer.Panels.WebUiThumbnailViewerPanelJS
-      = items.getItemByRegisteredId('thumbnailViewerPanel') as Vintasoft.Imaging.DocumentViewer.Panels.WebUiThumbnailViewerPanelJS;
+    let thumbnailViewerPanel: Vintasoft.Imaging.UI.Panels.WebUiThumbnailViewerPanelJS
+      = items.getItemByRegisteredId('thumbnailViewerPanel') as Vintasoft.Imaging.UI.Panels.WebUiThumbnailViewerPanelJS;
     // if panel is found
     if (thumbnailViewerPanel != null)
       // subscribe to the "actived" event of the thumbnail viewer panel of document viewer
@@ -355,8 +358,8 @@ export class AnnotationDemoComponent {
 
     let items: Vintasoft.Imaging.UI.UIElements.WebUiElementCollectionJS = this._docViewer.get_Items();
 
-    let annotationCommentListPanel: Vintasoft.Imaging.DocumentViewer.Panels.WebUiAnnotationCommentListPanelJS
-      = items.getItemByRegisteredId("annotationCommentListPanel") as Vintasoft.Imaging.DocumentViewer.Panels.WebUiAnnotationCommentListPanelJS;
+    let annotationCommentListPanel: Vintasoft.Imaging.Annotation.UI.Panels.WebUiAnnotationCommentListPanelJS
+      = items.getItemByRegisteredId("annotationCommentListPanel") as Vintasoft.Imaging.Annotation.UI.Panels.WebUiAnnotationCommentListPanelJS;
 
     // subscribe to the "commentAdded" event of annotation comment list panel
     Vintasoft.Shared.subscribeToEvent(annotationCommentListPanel, "commentAdded", this.__annotationCommentListPanel_commentAdded);
