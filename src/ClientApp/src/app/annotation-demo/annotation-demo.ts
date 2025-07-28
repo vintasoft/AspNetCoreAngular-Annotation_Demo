@@ -115,9 +115,9 @@ export class AnnotationDemoComponent {
       // specify that the image viewer must use the progress image for indicating the image loading progress
       imageViewer1.set_ProgressImage(progressImage);
 
-      // get the visual tool, which allows to annotate and pan images in image viewer
+      // get the visual tool, which allows to annotate, pan and zoom images in image viewer
       let annotationPanTool: Vintasoft.Imaging.UI.VisualTools.WebVisualToolJS
-        = this._docViewer.getVisualToolById('AnnotationVisualTool,PanTool');
+        = this._docViewer.getVisualToolById('AnnotationVisualTool,PanTool,ZoomTool');
       this._docViewer.set_MandatoryVisualTool(annotationPanTool);
       this._docViewer.set_CurrentVisualTool(annotationPanTool);
 
@@ -132,12 +132,23 @@ export class AnnotationDemoComponent {
   // === "Tools" toolbar ===
 
   /**
+   * Creates UI button for activating the visual tool, which allows to annotate, pan and zoom images in image viewer.
+   */
+  __createAnnotationAndPanAndZoomToolButton() {
+    return new Vintasoft.Imaging.UI.UIElements.WebUiVisualToolButtonJS({
+      cssClass: 'vsdv-tools-panAndZoomButton',
+      title: 'Annotation, Pan, Zoom',
+      localizationId: "panAndZoomToolButton"
+    }, 'AnnotationVisualTool,PanTool,ZoomTool');
+  }
+
+  /**
    * Creates UI button for activating the visual tool, which allows to annotate and pan images in image viewer.
    */
   __createAnnotationAndPanToolButton() {
     return new Vintasoft.Imaging.UI.UIElements.WebUiVisualToolButtonJS({
-      cssClass: 'vsui-button vsdv-tools-panButton',
-      title: 'Pan',
+      cssClass: 'vsdv-tools-panButton',
+      title: 'Annotation, Pan',
       localizationId: "panToolButton"
     }, 'AnnotationVisualTool,PanTool');
   }
@@ -175,6 +186,8 @@ export class AnnotationDemoComponent {
    * Registers custom UI elements in "WebUiElementsFactoryJS".
    */
   __registerNewUiElements() {
+    // register the "Pan and zoom" button in web UI elements factory
+    Vintasoft.Imaging.UI.UIElements.WebUiElementsFactoryJS.registerElement('panAndZoomToolButton', this.__createAnnotationAndPanAndZoomToolButton);
     // register the "Pan" button in web UI elements factory
     Vintasoft.Imaging.UI.UIElements.WebUiElementsFactoryJS.registerElement('panToolButton', this.__createAnnotationAndPanToolButton);
   }
