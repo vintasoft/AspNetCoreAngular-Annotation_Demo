@@ -115,9 +115,21 @@ export class AnnotationDemoComponent {
       // specify that the image viewer must use the progress image for indicating the image loading progress
       imageViewer1.set_ProgressImage(progressImage);
 
+      // names of visual tools in composite visual tool
+      let visualToolNames: string = "AnnotationVisualTool,PanTool";
+      // if touch device is used
+      if (this.__isTouchDevice()) {
+          // get zoom tool from document viewer
+          let zoomTool: Vintasoft.Imaging.UI.VisualTools.WebVisualToolJS = this._docViewer.getVisualToolById('ZoomTool');
+          // specify that zoom tool should not disable context menu
+          zoomTool.set_DisableContextMenu(false);
+
+          // add name of zoom tool to the names of visual tools of composite visual tool
+          visualToolNames = visualToolNames + ",ZoomTool";
+      }
       // get the visual tool, which allows to annotate, pan and zoom images in image viewer
       let annotationPanTool: Vintasoft.Imaging.UI.VisualTools.WebVisualToolJS
-        = this._docViewer.getVisualToolById('AnnotationVisualTool,PanTool,ZoomTool');
+        = this._docViewer.getVisualToolById(visualToolNames);
       this._docViewer.set_MandatoryVisualTool(annotationPanTool);
       this._docViewer.set_CurrentVisualTool(annotationPanTool);
 
@@ -132,25 +144,24 @@ export class AnnotationDemoComponent {
   // === "Tools" toolbar ===
 
   /**
-   * Creates UI button for activating the visual tool, which allows to annotate, pan and zoom images in image viewer.
-   */
-  __createAnnotationAndPanAndZoomToolButton() {
-    return new Vintasoft.Imaging.UI.UIElements.WebUiVisualToolButtonJS({
-      cssClass: 'vsdv-tools-panAndZoomButton',
-      title: 'Annotation, Pan, Zoom',
-      localizationId: "panAndZoomToolButton"
-    }, 'AnnotationVisualTool,PanTool,ZoomTool');
-  }
-
-  /**
    * Creates UI button for activating the visual tool, which allows to annotate and pan images in image viewer.
    */
   __createAnnotationAndPanToolButton() {
-    return new Vintasoft.Imaging.UI.UIElements.WebUiVisualToolButtonJS({
-      cssClass: 'vsdv-tools-panButton',
-      title: 'Annotation, Pan',
-      localizationId: "panToolButton"
-    }, 'AnnotationVisualTool,PanTool');
+    // if touch device is used
+    if (_annotationDemoComponent.__isTouchDevice()) {
+        return new Vintasoft.Imaging.UI.UIElements.WebUiVisualToolButtonJS({
+            cssClass: "vsdv-tools-panButton",
+            title: "Annotation, Pan, Zoom",
+            localizationId: "panToolButton"
+        }, "AnnotationVisualTool,PanTool,ZoomTool");
+    }
+    else {
+        return new Vintasoft.Imaging.UI.UIElements.WebUiVisualToolButtonJS({
+            cssClass: "vsdv-tools-panButton",
+            title: "Annotation, Pan",
+            localizationId: "panToolButton"
+        }, "AnnotationVisualTool,PanTool");
+    }
   }
 
 
@@ -186,8 +197,6 @@ export class AnnotationDemoComponent {
    * Registers custom UI elements in "WebUiElementsFactoryJS".
    */
   __registerNewUiElements() {
-    // register the "Pan and zoom" button in web UI elements factory
-    Vintasoft.Imaging.UI.UIElements.WebUiElementsFactoryJS.registerElement('panAndZoomToolButton', this.__createAnnotationAndPanAndZoomToolButton);
     // register the "Pan" button in web UI elements factory
     Vintasoft.Imaging.UI.UIElements.WebUiElementsFactoryJS.registerElement('panToolButton', this.__createAnnotationAndPanToolButton);
   }
@@ -275,18 +284,20 @@ export class AnnotationDemoComponent {
    * @param docViewer The document viewer.
    */
   __initializeVisualTools(docViewer: Vintasoft.Imaging.DocumentViewer.WebDocumentViewerJS) {
-    let rectangularSelectionTool: Vintasoft.Imaging.UI.VisualTools.WebVisualToolJS
-      = docViewer.getVisualToolById('RectangularSelectionTool');
-    rectangularSelectionTool.set_DisableContextMenu(true);
+    if (!_annotationDemoComponent.__isTouchDevice()) {
+        let rectangularSelectionTool: Vintasoft.Imaging.UI.VisualTools.WebVisualToolJS
+          = docViewer.getVisualToolById('RectangularSelectionTool');
+        rectangularSelectionTool.set_DisableContextMenu(true);
 
-    let magnifierTool: Vintasoft.Imaging.UI.VisualTools.WebVisualToolJS = docViewer.getVisualToolById('MagnifierTool');
-    magnifierTool.set_DisableContextMenu(true);
+        let magnifierTool: Vintasoft.Imaging.UI.VisualTools.WebVisualToolJS = docViewer.getVisualToolById('MagnifierTool');
+        magnifierTool.set_DisableContextMenu(true);
 
-    let zoomTool: Vintasoft.Imaging.UI.VisualTools.WebVisualToolJS = docViewer.getVisualToolById('ZoomTool');
-    zoomTool.set_DisableContextMenu(true);
+        let zoomTool: Vintasoft.Imaging.UI.VisualTools.WebVisualToolJS = docViewer.getVisualToolById('ZoomTool');
+        zoomTool.set_DisableContextMenu(true);
 
-    let zoomSelectionTool: Vintasoft.Imaging.UI.VisualTools.WebVisualToolJS = docViewer.getVisualToolById('ZoomSelectionTool');
-    zoomSelectionTool.set_DisableContextMenu(true);
+        let zoomSelectionTool: Vintasoft.Imaging.UI.VisualTools.WebVisualToolJS = docViewer.getVisualToolById('ZoomSelectionTool');
+        zoomSelectionTool.set_DisableContextMenu(true);
+    }
 
     // initialize the annotation visual tool
     AnnotationUiHelper.initializeAnnotationVisualTool(docViewer);
@@ -528,6 +539,13 @@ export class AnnotationDemoComponent {
     let dlg: ErrorMessageDialog = new ErrorMessageDialog(_annotationDemoComponent.modalService);
     dlg.errorData = data;
     dlg.open();
+  }
+
+  /**
+   Returns a value indicating whether touch device is used.
+  */
+  __isTouchDevice() {
+    return navigator.maxTouchPoints > 0;
   }
 
 }
