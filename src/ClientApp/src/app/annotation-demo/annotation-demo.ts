@@ -251,13 +251,15 @@ export class AnnotationDemoComponent {
     let items: Vintasoft.Imaging.UI.UIElements.WebUiElementCollectionJS
       = docViewerSettings.get_Items();
 
+    let supportedFileExtensions: string = ".bmp, .cur, .gif, .ico, .j2c, .j2k, .jb2, .jbig2, .jp2, .jpc, .jpeg, .jpg, .jls, .pbm, .pcx, .pdf, .png, .tga, .tif, .tiff";
+
     let uploadAndOpenFileButton: Vintasoft.Imaging.UI.UIElements.WebUiUploadFileButtonJS = items.getItemByRegisteredId("uploadAndOpenFileButton") as Vintasoft.Imaging.UI.UIElements.WebUiUploadFileButtonJS;
     if (uploadAndOpenFileButton != null)
-      uploadAndOpenFileButton.set_FileExtensionFilter(".bmp, .cur, .gif, .ico, .j2c, .j2k, .jb2, .jbig2, .jp2, .jpc, .jpeg, .jpg, .jls, .pbm, .pcx, .pdf, .png, .tga, .tif, .tiff");
+      uploadAndOpenFileButton.set_FileExtensionFilter(supportedFileExtensions);
 
     let uploadAndAddFileButton: Vintasoft.Imaging.UI.UIElements.WebUiUploadFileButtonJS = items.getItemByRegisteredId("uploadAndAddFileButton") as Vintasoft.Imaging.UI.UIElements.WebUiUploadFileButtonJS;
     if (uploadAndAddFileButton != null)
-      uploadAndAddFileButton.set_FileExtensionFilter(".bmp, .cur, .gif, .ico, .j2c, .j2k, .jb2, .jbig2, .jp2, .jpc, .jpeg, .jpg, .jls, .pbm, .pcx, .pdf, .png, .tga, .tif, .tiff");
+      uploadAndAddFileButton.set_FileExtensionFilter(supportedFileExtensions);
 
     // get the "Tools" menu panel
     let toolsMenuPanel: Vintasoft.Imaging.UI.Panels.WebUiVisualToolsToolbarPanelJS
